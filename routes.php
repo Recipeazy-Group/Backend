@@ -70,6 +70,19 @@
         return $this->response->withJson($input);
         });
 
+        //TESTED
+    //Add recipe image
+    $app->post('/ReviewedRecipe/new', function ($request, $response) {
+        $input = $request->getParsedBody();
+        $sql = "INSERT INTO UserPastRecipes (Email, RecipeId) VALUES (:Email, :RecipeId)";
+        $sth = $this->db->prepare($sql);
+        $sth->bindParam("Email", $input['Email']);
+        $sth->bindParam("RecipeId", $input['RecipeId']);
+        $sth->execute();
+        return $this->response->withJson($input);
+        });
+
+
 
 
     //------------GET----------------------------
@@ -138,6 +151,28 @@
         $Recipes = $sth->fetchAll();
         return $this->response->withJson($Recipes);
         });
+
+        $app->get('/Steps/[{RecipeId}]', function ($request, $response, $args)
+        {
+        $RecipeId = $_GET['RecipeId'];
+        $sth= $this->db->prepare("SELECT * FROM Steps WHERE RecipeId = '$RecipeId'");
+        $sth->bindParam("RecipeId", $RecipeId);
+        $sth->execute();
+        $Recipes = $sth->fetchAll();
+        return $this->response->withJson($Recipes);
+        });
+
+        $app->get('/IngredientInfo/[{RecipeId}]', function ($request, $response, $args)
+        {
+        $RecipeId = $_GET['RecipeId'];
+        $sth= $this->db->prepare("SELECT * FROM IngredientInfo WHERE RecipeId = '$RecipeId'");
+        $sth->bindParam("RecipeId", $RecipeId);
+        $sth->execute();
+        $Recipes = $sth->fetchAll();
+        return $this->response->withJson($Recipes);
+        });
+
+
 
 
         //TESTED
@@ -213,7 +248,7 @@
 
         //Add difficulty rating
         $app->put('/Recipes/DifficultyRating/{RecipeId}', function ($request, $response, $args) {
-            $RecipeId = $request->getAttribute('RecipeId');
+            $RecipeId = $_GET['RecipeId'];
             $input = $request->getParsedBody();
             $DifficultyRating = $input ['DifficultyRating'];
             $sql = "update Recipes set DRatingCount = DRatingCount +1 where RecipeId = '$RecipeId'";
@@ -231,14 +266,15 @@
             });
 
         //Add tasty rating
-         $app->put('/Recipes/TastyRating/{RecipeId}', function ($request, $response, $args) {
-            $RecipeId = $request->getAttribute('RecipeId');
+         $app->put('/Recipes/TastyRating/{RecipeId}', function ($request, $response) {
+            $RecipeId = $_GET['RecipeId'];
             $input = $request->getParsedBody();
             $TastyRating = $input ['TastyRating'];
-            $sql = "update Recipes set TRatingCount = TRatingCount +1 where RecipeId = '$RecipeId'";
+            $sql = "UPDATE Recipes set TRatingCount = TRatingCount+1 where RecipeId = '$RecipeId'";
             $sth = $this->db->prepare($sql);
             $sth->bindParam("TastyRating", $input['TastyRating']);
             $sth->execute();
+            
             
             $sql2 = "update Recipes set TastyRatingTotal = TastyRatingTotal + $TastyRating where RecipeId = '$RecipeId'";
             $sth2 = $this->db->prepare($sql2);
@@ -247,31 +283,31 @@
             $sql3 = "update Recipes set TastyRating = Recipes.TastyRatingTotal/ Recipes.TRatingCount where RecipeId = '$RecipeId'";
             $sth3 = $this->db->prepare($sql3);
             $sth3->execute();
+      
             });
 
-            //delete user ingredients
-         $app->delete('/DeleteUserIngredients/{Email}/{IngredientName}', function ($request, $response, $args) {
-            $Email = $request->getAttribute('Email');
-            $IngredientName = $request->getAttribute('IngredientName');
-            $sql = "delete from UserIngredients 
-            where Email = '$Email' and IngredientName = '$IngredientName";
-            $sth = $this->db->prepare($sql);
-            $sth->execute();
-        
-            });
 
-//Delete user favorites
-            $app->delete('/DeleteUserFavorites/{Email}/{RecipeId}', function ($request, $response, $args) {
-                $Email = $request->getAttribute('Email');
-                $RecipeId = $request->getAttribute('RecipeId');
-                $sql = "delete from UserFavorites
-                where Email = '$Email' and RecipeId = '$RecipeId";
-                $sth = $this->db->prepare($sql);
-                $sth->execute();
-            
-                });
+
+                          $app->delete('/UserFavorites/delete', function ($request, $response) {
+                            $input = $request->getParsedBody();
+                             $sql = "DELETE FROM UserFavorites WHERE Email = :Email and RecipeId =:RecipeId";
+                            $sth = $this->db->prepare($sql);
+                            $sth->bindParam("Email", $input['Email']);
+                            $sth->bindParam("RecipeId", $input['RecipeId']);
+                            $sth->execute();
+                            return $this->response->withJson($input);
+                            });
+
+                            $app->delete('/UserIngredients/delete', function ($request, $response) {
+                                $input = $request->getParsedBody();
+                                 $sql = "DELETE FROM UserIngredients WHERE Email = :Email and IngredientName =:IngredientName";
+                                $sth = $this->db->prepare($sql);
+                                $sth->bindParam("Email", $input['Email']);
+                                $sth->bindParam("IngredientName", $input['IngredientName']);
+                                $sth->execute();
+                                return $this->response->withJson($input);
+                                });
     
-
 
 
             
