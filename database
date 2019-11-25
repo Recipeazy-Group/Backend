@@ -1,0 +1,181 @@
+
+
+
+
+
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema recipeazy
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema recipeazy
+-- -----------------------------------------------------
+
+use recipeazy;
+-- -----------------------------------------------------
+-- Table `recipeazy`.`Recipes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `recipeazy`.`Recipes` (
+  `RecipeId` INT(11) NOT NULL AUTO_INCREMENT,
+  `RecipeName` VARCHAR(255) NOT NULL,
+  `IngredientInfo` VARCHAR(5000) NULL DEFAULT NULL,
+  `Steps` VARCHAR(5000) NULL DEFAULT NULL,
+  `DifficultyRating` INT(11) NULL DEFAULT NULL,
+  `TastyRating` INT(11) NULL DEFAULT NULL,
+  `DRatingCount` INT(11) NULL DEFAULT NULL,
+  `TRatingCount` INT(11) NULL DEFAULT NULL,
+  `DifficultyRatingTotal` INT(11) NULL DEFAULT NULL,
+  `TastyRatingTotal` INT(11) NULL DEFAULT NULL,
+  PRIMARY KEY (`RecipeId`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 92
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `recipeazy`.`IngredientInfo`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `recipeazy`.`IngredientInfo` (
+  `RecipeId` INT(11) NOT NULL,
+  `IngredientInfo` VARCHAR(2000) NOT NULL,
+  INDEX `RecipeId` (`RecipeId` ASC),
+  CONSTRAINT `ingredientinfo_ibfk_1`
+    FOREIGN KEY (`RecipeId`)
+    REFERENCES `recipeazy`.`Recipes` (`RecipeId`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `recipeazy`.`Ingredients`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `recipeazy`.`Ingredients` (
+  `RecipeId` INT(11) NOT NULL,
+  `IngredientName` VARCHAR(200) NOT NULL,
+  INDEX `RecipeId` (`RecipeId` ASC),
+  CONSTRAINT `ingredients_ibfk_1`
+    FOREIGN KEY (`RecipeId`)
+    REFERENCES `recipeazy`.`Recipes` (`RecipeId`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `recipeazy`.`RecipeImages`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `recipeazy`.`RecipeImages` (
+  `ImageId` INT(11) NOT NULL AUTO_INCREMENT,
+  `RecipeId` INT(11) NOT NULL,
+  `ImageUrl` VARCHAR(1000) NOT NULL,
+  PRIMARY KEY (`ImageId`),
+  INDEX `RecipeId` (`RecipeId` ASC),
+  CONSTRAINT `recipeimages_ibfk_1`
+    FOREIGN KEY (`RecipeId`)
+    REFERENCES `recipeazy`.`Recipes` (`RecipeId`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 2
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `recipeazy`.`Steps`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `recipeazy`.`Steps` (
+  `RecipeId` INT(11) NOT NULL,
+  `StepNumber` INT(11) NOT NULL,
+  `Step` VARCHAR(5000) NOT NULL,
+  INDEX `RecipeId` (`RecipeId` ASC),
+  CONSTRAINT `steps_ibfk_1`
+    FOREIGN KEY (`RecipeId`)
+    REFERENCES `recipeazy`.`Recipes` (`RecipeId`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `recipeazy`.`Users`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `recipeazy`.`Users` (
+  `FirstName` VARCHAR(255) NOT NULL,
+  `LastName` VARCHAR(255) NOT NULL,
+  `Email` VARCHAR(255) NOT NULL,
+  `UserPassword` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`Email`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `recipeazy`.`UserFavorites`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `recipeazy`.`UserFavorites` (
+  `Email` VARCHAR(255) NOT NULL,
+  `RecipeId` INT(11) NOT NULL,
+  UNIQUE INDEX `Email` (`Email` ASC, `RecipeId` ASC),
+  INDEX `RecipeId` (`RecipeId` ASC),
+  CONSTRAINT `userfavorites_ibfk_1`
+    FOREIGN KEY (`Email`)
+    REFERENCES `recipeazy`.`Users` (`Email`),
+  CONSTRAINT `userfavorites_ibfk_2`
+    FOREIGN KEY (`RecipeId`)
+    REFERENCES `recipeazy`.`Recipes` (`RecipeId`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `recipeazy`.`UserIngredients`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `recipeazy`.`UserIngredients` (
+  `Email` VARCHAR(255) NOT NULL,
+  `IngredientName` VARCHAR(200) NOT NULL,
+  UNIQUE INDEX `Email` (`Email` ASC, `IngredientName` ASC),
+  CONSTRAINT `useringredients_ibfk_1`
+    FOREIGN KEY (`Email`)
+    REFERENCES `recipeazy`.`Users` (`Email`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `recipeazy`.`UserPastRecipes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `recipeazy`.`UserPastRecipes` (
+  `Email` VARCHAR(255) NOT NULL,
+  `RecipeId` INT(11) NOT NULL,
+  UNIQUE INDEX `Email` (`Email` ASC, `RecipeId` ASC),
+  INDEX `RecipeId` (`RecipeId` ASC),
+  CONSTRAINT `userpastrecipes_ibfk_1`
+    FOREIGN KEY (`Email`)
+    REFERENCES `recipeazy`.`Users` (`Email`),
+  CONSTRAINT `userpastrecipes_ibfk_2`
+    FOREIGN KEY (`RecipeId`)
+    REFERENCES `recipeazy`.`Recipes` (`RecipeId`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+
+
+
+
+
+
+
+
+
+

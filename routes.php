@@ -70,6 +70,19 @@
         return $this->response->withJson($input);
         });
 
+        //TESTED
+    //Add recipe image
+    $app->post('/ReviewedRecipe/new', function ($request, $response) {
+        $input = $request->getParsedBody();
+        $sql = "INSERT INTO UserPastRecipes (Email, RecipeId) VALUES (:Email, :RecipeId)";
+        $sth = $this->db->prepare($sql);
+        $sth->bindParam("Email", $input['Email']);
+        $sth->bindParam("RecipeId", $input['RecipeId']);
+        $sth->execute();
+        return $this->response->withJson($input);
+        });
+
+
 
 
     //------------GET----------------------------
@@ -84,52 +97,16 @@
         $Users = $sth->fetchAll();
         return $this->response->withJson($Users);
         });
+       
 
-        
-
-     //Get account by email
-     $app->get('/User/{Email}', function ($request, $response, $args)
-        {
-        $Email = $request->getAttribute('Email');
-        $sth= $this->db->prepare("SELECT FirstName FROM Users WHERE Email = '$Email'");
-        $sth->bindParam("Email", $args['Email']);
-        $sth->execute();
-        $Users = $sth->fetchAll();
-        return $this->response->withJson($Users);
-        });
-
-        	//display nannys in certain zipcode
-    $app->get('/idk/{RecipeId}', function ($request, $response, $args){
-        $zip = $request->getAttribute('RecipeId');
-        $sth = $this->db->prepare("SELECT * FROM Recipes WHERE RecipeId = $RecipeId" );
-        $sth->execute();  
-        $zip = $sth->fetchAll();
-        return $this->response->withJson($zip);
-        });
-        
-        $app->get('/GetUser/[{Email}]', function ($request, $response, $args) 
-        {$sth = $this->db->prepare("SELECT * FROM Users WHERE Email=:Email");
-            $sth->bindParam("Email", $args['Email']);
-            $sth->execute();
-            $user = $sth->fetchObject();
-            return $this->response->withJson($user);
-        });
-
-        /*
-        $app->get('/GetUser/:Email', function ($request, $response, $Email) 
-        {$sth = $this->db->prepare("SELECT * FROM Users WHERE Email=$Email");
-            //$sth->bindParam("Email", $args['Email']);
-            $sth->execute();
-            $user = $sth->fetchObject();
-            return $this->response->withJson($user);
-        });*/
-
-
+    //TESTED
      //Get all recipe info by RecipeId
-     $app->get('/Recipe/{RecipeId}', function ($request, $response, $RecipeId)
+     //SENDING FORMAT: http://localhost:8080/Recipe/RecipeId?RecipeId=1
+     $app->get('/Recipe/[{RecipeId}]', function ($request, $response, $RecipeId)
         {
-        $Email = $request->getAttribute('RecipeId');
+            $RecipeId = $_GET['RecipeId'];
         $sth= $this->db->prepare("SELECT * FROM Recipes WHERE RecipeId = '$RecipeId'");
+        $sth->bindParam("RecipeId", $RecipeId);
         $sth->execute();
         $Recipes = $sth->fetchAll();
         return $this->response->withJson($Recipes);
@@ -146,69 +123,114 @@
         return $this->response->withJson($Recipes);
         });
 
+        //TESTED
         //Get all recipes
-     $app->get('/RecipesByIngredient/{IngredientName}', function ($request, $response, $args)
+     $app->get('/RecipesByIngredient/[{IngredientName}]', function ($request, $response, $args)
         {
-        $IngredientName = $request->getAttribute('IngredientName');
-        $sth= $this->db->prepare("SELECT * FROM Recipes r
+        $IngredientName = $_GET['IngredientName']; 
+        $sth= $this->db->prepare("SELECT r.RecipeName FROM Recipes r
         join Ingredients i
         on i.RecipeId = r.RecipeId
         where i.IngredientName = '$IngredientName'");
+        $sth->bindParam("IngredientName", $IngredientName);
         $sth->execute();
         $Recipes = $sth->fetchAll();
         return $this->response->withJson($Recipes);
         });
+
+
+
 
         //Get all recipe info by RecipeId
-     $app->get('/RecipeImages/{RecipeId}', function ($request, $response, $args)
+     $app->get('/RecipeImages/[{RecipeId}]', function ($request, $response, $args)
         {
-        $Email = $request->getAttribute('RecipeId');
+        $RecipeId = $_GET['RecipeId'];
         $sth= $this->db->prepare("SELECT * FROM RecipeImages WHERE RecipeId = '$RecipeId'");
+        $sth->bindParam("RecipeId", $RecipeId);
         $sth->execute();
         $Recipes = $sth->fetchAll();
         return $this->response->withJson($Recipes);
         });
 
-    
-
-    //Get User Ingredients by email
-    $app->get('/UserIngredients/{Email}', function ($request, $response, $args)
+        $app->get('/Steps/[{RecipeId}]', function ($request, $response, $args)
         {
-        $Email = $request->getAttribute('Email');
-        $sth= $this->db->prepare("SELECT IngredientNames FROM UserIngredients WHERE Email = '$Email'");
+        $RecipeId = $_GET['RecipeId'];
+        $sth= $this->db->prepare("SELECT * FROM Steps WHERE RecipeId = '$RecipeId'");
+        $sth->bindParam("RecipeId", $RecipeId);
         $sth->execute();
-        $IngredientNames = $sth->fetchAll();
-        return $this->response->withJson($IngredientNames);
+        $Recipes = $sth->fetchAll();
+        return $this->response->withJson($Recipes);
+        });
+
+        $app->get('/IngredientInfo/[{RecipeId}]', function ($request, $response, $args)
+        {
+        $RecipeId = $_GET['RecipeId'];
+        $sth= $this->db->prepare("SELECT * FROM IngredientInfo WHERE RecipeId = '$RecipeId'");
+        $sth->bindParam("RecipeId", $RecipeId);
+        $sth->execute();
+        $Recipes = $sth->fetchAll();
+        return $this->response->withJson($Recipes);
         });
 
 
-    //Get recipes containting all user ingredients
-    $app->get('/Recipes/{Email}', function ($request, $response, $args)
+
+
+        //TESTED
+        $app->get('/User/[{Email}]', function ($request, $response, $args) 
         {
-        $Email = $request->getAttribute('Email');
+            $Email = $_GET['Email']; 
+            $sth= $this->db->prepare("SELECT *FROM Users where Email = '$Email'" );
+            $sth->bindParam("Email", $Email);
+            $sth->execute();
+            $users = $sth->fetchAll();
+            return $this->response->withJson($users);  
+        });
+
+
+
+        
+    
+    //TESTED
+    //Get User Ingredients by email
+    $app->get('/UserIngredients/[{Email}]', function ($request, $response, $args)
+        {
+            $Email = $_GET['Email']; 
+            $sth= $this->db->prepare("SELECT IngredientName FROM UserIngredients where Email = '$Email'" );
+            $sth->bindParam("Email", $Email);
+            $sth->execute();
+            $users = $sth->fetchAll();
+            return $this->response->withJson($users); 
+        });
+
+
+    //TESTED
+    //Get recipes containting all user ingredients
+    $app->get('/Recipes/[{Email}]', function ($request, $response, $args)
+        {
+        $Email = $_GET['Email'];
         $sth= $this->db->prepare("SELECT DISTINCT r.RecipeName, r.RecipeId FROM Recipes r
         WHERE NOT EXISTS (
         SELECT 1 FROM Ingredients i WHERE r.RecipeId=i.RecipeId AND i.IngredientName 
         NOT IN (SELECT IngredientName FROM UserIngredients WHERE Email = '$Email')
-        ");
+        )");
+        $sth->bindParam("Email", $Email);
         $sth->execute();
         $Recipes = $sth->fetchAll();
         return $this->response->withJson($Recipes);
         });
 
 
-
+    //TESTED
     //Get users favorite recipes
-    $app->get('/UserFavorites/{Email}', function ($request, $response, $args)
+    $app->get('/UserFavorites/[{Email}]', function ($request, $response, $args)
         {
-        $Email = $request->getAttribute('Email');
+            $Email = $_GET['Email'];
         $sth= $this->db->prepare("SELECT Recipes.RecipeName, Recipes.RecipeId
         FROM Recipes
         INNER JOIN  UserFavorites 
         ON Recipes.RecipeId = UserFavorites.RecipeId
-        WHERE UserFavorites.Email = '$Email'
-        )
-        ");
+        WHERE UserFavorites.Email = '$Email'");
+        $sth->bindParam("Email", $Email);
         $sth->execute();
         $Recipes = $sth->fetchAll();
         return $this->response->withJson($Recipes);
@@ -226,7 +248,7 @@
 
         //Add difficulty rating
         $app->put('/Recipes/DifficultyRating/{RecipeId}', function ($request, $response, $args) {
-            $RecipeId = $request->getAttribute('RecipeId');
+            $RecipeId = $_GET['RecipeId'];
             $input = $request->getParsedBody();
             $DifficultyRating = $input ['DifficultyRating'];
             $sql = "update Recipes set DRatingCount = DRatingCount +1 where RecipeId = '$RecipeId'";
@@ -244,14 +266,15 @@
             });
 
         //Add tasty rating
-         $app->put('/Recipes/TastyRating/{RecipeId}', function ($request, $response, $args) {
-            $RecipeId = $request->getAttribute('RecipeId');
+         $app->put('/Recipes/TastyRating/{RecipeId}', function ($request, $response) {
+            $RecipeId = $_GET['RecipeId'];
             $input = $request->getParsedBody();
             $TastyRating = $input ['TastyRating'];
-            $sql = "update Recipes set TRatingCount = TRatingCount +1 where RecipeId = '$RecipeId'";
+            $sql = "UPDATE Recipes set TRatingCount = TRatingCount+1 where RecipeId = '$RecipeId'";
             $sth = $this->db->prepare($sql);
             $sth->bindParam("TastyRating", $input['TastyRating']);
             $sth->execute();
+            
             
             $sql2 = "update Recipes set TastyRatingTotal = TastyRatingTotal + $TastyRating where RecipeId = '$RecipeId'";
             $sth2 = $this->db->prepare($sql2);
@@ -260,31 +283,31 @@
             $sql3 = "update Recipes set TastyRating = Recipes.TastyRatingTotal/ Recipes.TRatingCount where RecipeId = '$RecipeId'";
             $sth3 = $this->db->prepare($sql3);
             $sth3->execute();
+      
             });
 
-            //delete user ingredients
-         $app->delete('/DeleteUserIngredients/{Email}/{IngredientName}', function ($request, $response, $args) {
-            $Email = $request->getAttribute('Email');
-            $IngredientName = $request->getAttribute('IngredientName');
-            $sql = "delete from UserIngredients 
-            where Email = '$Email' and IngredientName = '$IngredientName";
-            $sth = $this->db->prepare($sql);
-            $sth->execute();
-        
-            });
 
-//Delete user favorites
-            $app->delete('/DeleteUserFavorites/{Email}/{RecipeId}', function ($request, $response, $args) {
-                $Email = $request->getAttribute('Email');
-                $RecipeId = $request->getAttribute('RecipeId');
-                $sql = "delete from UserFavorites
-                where Email = '$Email' and RecipeId = '$RecipeId";
-                $sth = $this->db->prepare($sql);
-                $sth->execute();
-            
-                });
+
+                          $app->delete('/UserFavorites/delete', function ($request, $response) {
+                            $input = $request->getParsedBody();
+                             $sql = "DELETE FROM UserFavorites WHERE Email = :Email and RecipeId =:RecipeId";
+                            $sth = $this->db->prepare($sql);
+                            $sth->bindParam("Email", $input['Email']);
+                            $sth->bindParam("RecipeId", $input['RecipeId']);
+                            $sth->execute();
+                            return $this->response->withJson($input);
+                            });
+
+                            $app->delete('/UserIngredients/delete', function ($request, $response) {
+                                $input = $request->getParsedBody();
+                                 $sql = "DELETE FROM UserIngredients WHERE Email = :Email and IngredientName =:IngredientName";
+                                $sth = $this->db->prepare($sql);
+                                $sth->bindParam("Email", $input['Email']);
+                                $sth->bindParam("IngredientName", $input['IngredientName']);
+                                $sth->execute();
+                                return $this->response->withJson($input);
+                                });
     
-
 
 
             

@@ -9,18 +9,18 @@ return [
             'template_path' => __DIR__ . '/../templates/',
         ],
 
+		// Database connection settings
+		"db" => [
+		"host" => "127.0.0.1",
+		"dbname" => "recipeazy",
+		"user" => "root",
+		"pass" => "yourpassword"],
+		
         // Monolog settings
         'logger' => [
             'name' => 'slim-app',
-            'path' => __DIR__ . '/../logs/app.log'
-            
-        ],
-         // Database connection settings           
-          "db" => [
-            "host" => "127.0.0.1:3306",
-            "dbname" => "recipeasy",
-            "user" => "root",
-            "pass" => "toor"
+            'path' => isset($_ENV['docker']) ? 'php://stdout' : __DIR__ . '/../logs/app.log',
+            'level' => \Monolog\Logger::DEBUG,
         ],
     ],
 ];
