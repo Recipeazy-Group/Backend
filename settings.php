@@ -17,10 +17,10 @@ return [
         ],
          // Database connection settings           
           "db" => [
-            "host" => "test",
-            "dbname" => "recipeazy",
+            "host" => "127.0.0.1:3306",
+            "dbname" => "recipeasy",
             "user" => "root",
-            "pass" => "yourpassword"
+            "pass" => "toor"
         ],
     ],
 ];
